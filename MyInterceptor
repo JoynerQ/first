@@ -1,0 +1,46 @@
+package com.yh.proxy01;
+
+import java.lang.reflect.Method;
+
+import net.sf.cglib.proxy.Enhancer;
+import net.sf.cglib.proxy.MethodInterceptor;
+import net.sf.cglib.proxy.MethodProxy;
+
+public class MyInterceptor implements MethodInterceptor{
+	private Object target;
+	private Transaction tr;
+	public MyInterceptor(Object target,Transaction tr){
+		this.target=target;
+		this.tr=tr;
+	}
+	public Object createProxy() {
+		Enhancer enhancer = new Enhancer();
+		enhancer.setCallback(this);
+		enhancer.setSuperclass(this.target.getClass());
+		return enhancer.create();
+	}
+	@Override
+	public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy){
+		System.out.println("try前");	
+		try{
+			if(method.getName().equals("updatePerson") || method.getName().equals("savePerson")
+					|| method.getName().equals("deletePerson")) {
+				tr.beginTransaction();
+				System.out.println("try内，invoke前");
+				Object result = proxy.invokeSuper(obj, args);
+				System.out.println("try内，invoke后");
+				tr.commit();
+				return result;
+			} else {
+				return proxy.invokeSuper(obj, args);
+			}
+		}catch (Throwable e) {
+			System.out.println("异常");
+			e.printStackTrace();
+		}finally{
+			System.out.println("finally");       
+		}
+		System.out.println("try块后");
+		return null;
+	}
+}
