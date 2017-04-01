@@ -1,0 +1,17 @@
+package com.yh.proxy01;
+
+public class PersonDaoImpl {
+    public void savePerson(){
+    	System.out.println("savePerson");
+    }
+    public void deletePerson(){
+    	System.out.println("deletePerson");
+    }
+    public void updatePerson(){
+    	System.out.println("updatePerson");
+    }
+    public void selectPerson(){
+    	System.out.println("selectPerson");
+    }
+    
+}
